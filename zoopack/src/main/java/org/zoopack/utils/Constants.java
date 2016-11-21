@@ -1,6 +1,7 @@
 package org.zoopack.utils;
 
 /**
+ * Constants paramters
  * @author wangxu
  * @date 2016/11/15
  */

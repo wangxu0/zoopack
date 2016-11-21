@@ -22,17 +22,27 @@ public class ServerListener {
 	
 	private Logger logger = LoggerFactory.getLogger(ServerListener.class);
 	
-	private String serverRoot;
-	private ZooKeeper zooKeeper;
+	private String serverRoot; //The server root directory where stored server list.
+	private ZooKeeper zooKeeper; //zookeeper client
 	
-	private volatile List<String> serverList;
-	private CountDownLatch latch = new CountDownLatch(1);
+	private volatile List<String> serverList; //server list
+	private CountDownLatch latch = new CountDownLatch(1); //make sure zookeeper was connected.
 	
+	/**
+	 * Construct server listner
+	 * @param serverRoot
+	 * @param zooKeeper
+	 */
 	public ServerListener(String serverRoot, ZooKeeper zooKeeper) {
 		this.serverRoot = serverRoot;
 		this.zooKeeper = zooKeeper;
 	}
 	
+	/**
+	 * Construct server listner
+	 * @param serverRoot
+	 * @param timeout
+	 */
 	public ServerListener(String serverRoot, int timeout) {
 		try {
 			this.serverRoot = serverRoot;
@@ -47,6 +57,10 @@ public class ServerListener {
 		}
 	}
 	
+	/**
+	 * Construct server listner
+	 * @param serverRoot
+	 */
 	public ServerListener(String serverRoot) {
 		try {
 			this.serverRoot = serverRoot;
@@ -61,10 +75,17 @@ public class ServerListener {
 		}
 	}
 	
+	/**
+	 * Get newest server list.
+	 * @return
+	 */
 	public List<String> getServerList() {
 		return serverList;
 	}
 	
+	/**
+	 * Update the server list from zookepper server root directory.
+	 */
 	private void updateServerList() {
 		try {
 			List<String> children = zooKeeper.getChildren(serverRoot, new Watcher() {

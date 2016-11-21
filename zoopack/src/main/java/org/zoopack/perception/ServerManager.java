@@ -22,18 +22,28 @@ import java.util.concurrent.CountDownLatch;
 public class ServerManager {
 	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
 	
-	private String serverRoot;
-	private ZooKeeper zooKeeper;
+	private String serverRoot; //The server root directory where stored server list.
+	private ZooKeeper zooKeeper; //zookeeper client
 	
-	private String curServerPath;
+	private String curServerPath; //current server list path
 	
 	private CountDownLatch latch = new CountDownLatch(1);
 	
+	/**
+	 * Construct ServerManager
+	 * @param serverRoot
+	 * @param zooKeeper
+	 */
 	public ServerManager(String serverRoot, ZooKeeper zooKeeper) {
 		this.serverRoot = serverRoot;
 		this.zooKeeper = zooKeeper;
 	}
 	
+	/**
+	 * Construct ServerManager
+	 * @param serverRoot
+	 * @param timeout
+	 */
 	public ServerManager(String serverRoot, int timeout) {
 		try {
 			this.serverRoot = serverRoot;
@@ -48,6 +58,10 @@ public class ServerManager {
 		}
 	}
 	
+	/**
+	 * Construct ServerManager
+	 * @param serverRoot
+	 */
 	public ServerManager(String serverRoot) {
 		try {
 			this.serverRoot = serverRoot;
@@ -63,6 +77,10 @@ public class ServerManager {
 	}
 	
 	
+	/**
+	 * Register current server infomation to zookeeper server list root directory.
+	 * @param serverInfo
+	 */
 	public void register(String serverInfo) {
 		try {
 			Stat stat = zooKeeper.exists(serverRoot, false);
@@ -84,6 +102,9 @@ public class ServerManager {
 		
 	}
 	
+	/**
+	 * Delete current server infomation from zookeeper server list.
+	 */
 	public void delete() {
 		try {
 			if (zooKeeper.exists(curServerPath, false) == null) {
@@ -100,11 +121,14 @@ public class ServerManager {
 		}
 	}
 	
+	/**
+	 * update=delete+register for childnodechanged event watcher.
+	 * @param serverInfo
+	 */
 	public void update(String serverInfo) {
 		delete();
 		register(serverInfo);
 	}
-	
 	
 	private class ConnectedWatcher implements Watcher {
 		public void process(WatchedEvent watchedEvent) {

@@ -25,14 +25,18 @@ public class DistributedLock {
 
     private Logger logger = LoggerFactory.getLogger(DistributedLock.class);
 
-    private String lockRoot;
-    private ZooKeeper zooKeeper;
+    private String lockRoot; //lock root directory
+    private ZooKeeper zooKeeper; //Zookeeper client
 
-    private String curLockPath;
-    private String preLockPath;
+    private String curLockPath; //current lock path
+    private String preLockPath; //previous lock path
 
-    private CountDownLatch latch;
-
+    private CountDownLatch latch; //make sure the zookeeper client was connected.
+    
+    /**
+     * construct lock
+     * @param lockRoot
+     */
     public DistributedLock(String lockRoot) {
         try {
             latch = new CountDownLatch(1);
@@ -46,7 +50,12 @@ public class DistributedLock {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * construct lock
+     * @param lockRoot
+     * @param timeout
+     */
     public DistributedLock(String lockRoot, int timeout) {
         try {
             latch = new CountDownLatch(1);
@@ -60,7 +69,10 @@ public class DistributedLock {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * lock under the current lock root directory
+     */
     public void lock() {
         if (tryLock()) {
             logger.info(curLockPath + "is trun on.");
@@ -69,7 +81,11 @@ public class DistributedLock {
             logger.error("try lock is failed.");
         }
     }
-
+    
+    /**
+     * try to lock under the current lock root directory
+     * @return
+     */
     private boolean tryLock() {
         final CountDownLatch lockLatch = new CountDownLatch(1);
         try {
@@ -101,8 +117,11 @@ public class DistributedLock {
             e.printStackTrace();
         }
         return true;
-}
-
+    }
+    
+    /**
+     * unlock current lock
+     */
     public void unlock() {
         try {
             zooKeeper.delete(curLockPath, -1);
